@@ -1,104 +1,104 @@
-
-//Probeklauser 2
-
-#include<bits/stdc++.h>
+#include<iostream>
+#include<iomanip>
 using namespace std;
 
-enum DaylightSaving {summerTime,winterTime,unknown};
-class Clock{
+enum DaylightSaving
+{
+    summerTime,
+    winterTime,
+    unknown
+};
+
+class Clock
+{
 private:
     unsigned int hour;
     unsigned int minute;
     DaylightSaving daylightSaving;
 public:
-    class HourTooBig:public exception{};
-    class MinuteTooBig:public exception{};
+    class HourTooBig: public exception
+    {
 
-//public overloaded inline standard constructor initialising the clock(time) by an initialisation list to
-//midnight 00:00 o'clock with unknown daylight saving
-    Clock(){
+    };
+    class MinuteTooBig: public exception
+    {
 
-    }
-    //inline Clock(unsigned int hour=0,unsigned int minute=0):minute(minute),hour(hour),daylightSaving(unknown){}
-
-   inline Clock(unsigned int hour,unsigned int minute ,DaylightSaving daylightSaving):hour(hour),minute(minute)
-            ,daylightSaving(daylightSaving)
-    { if(hour>23 )
+    };
+    Clock():hour(0),minute(0),daylightSaving(unknown){}
+    Clock(unsigned int hour, unsigned int minute, DaylightSaving daylightSaving)
+    :hour(hour),minute(minute),daylightSaving(daylightSaving)
+    {
+        if(hour>23)
             throw HourTooBig();
-        if (minute>59)
+        if(minute>59)
             throw MinuteTooBig();
     }
-    void    set_daylightSaving(DaylightSaving){
+    void set_daylightSaving(DaylightSaving daylightSaving)
+    {
         this->daylightSaving=daylightSaving;
     }
-    DaylightSaving get_daylightSaving(){
+    DaylightSaving get_daylightSaving()
+    {
         return daylightSaving;
     }
-
-    //  public definition of an overloaded unary increment operator ++ incrementing the clock by one minute.
-    void operator ++( int){
-        if (minute>60 )
-        {
-            minute=0;
-            hour++;
-
-            if(hour>24){
-                hour =0;
-        }
-        }
-        else {
-            minute++;
-        }
-    }
-
-
-//public definition of a friend binary operator == to overload the comparison of the clock times for
-//two given references to objects of type Clock.
-    friend bool  operator==(Clock &c1,Clock &c2)
+    void operator++()
     {
-        if ((c1.hour == c2.hour)&&(c1.minute=c2.minute))
-            return true;
+        if(minute==59)
+            {
+                minute=0;
+                if(hour==23)
+                    hour=0;
+                else
+                     hour++;
+            }
         else
-            return false ;
+            minute++;
     }
 
-    friend ostream &operator<<(ostream &o,Clock &c ){
-
-        o<<setw(2)<<setfill('0')<<(c.minute/60)<<":"<<setw(2)<<setfill('0')<<c.minute%60;
-        return o;
+    friend bool operator==(Clock& t1, Clock& t2)
+    {
+        return t1.hour==t2.hour && t1.minute==t2.minute;
     }
+    friend ostream& operator<<(ostream&, Clock&);
+
 };
 
-int main(){
+ostream& operator<<(ostream& out, Clock& c)
+{
+    return out<<setw(2)<<setfill('0')<<c.hour<<":"<<setw(2)<<setfill('0')<<c.minute;
+}
 
-    Clock *clock1= new Clock(00,05,winterTime);
-    Clock clock2(23,05,summerTime);
+int main()
+{
+    Clock *clock1=new Clock(0,5,winterTime);
+    Clock clock2(23,9,summerTime);
     Clock *clock3;
-
     clock1->set_daylightSaving(summerTime);
-
-    for (int i;i<120;i++){
+    for(int i=0;i<120;i++)
+    {
         clock2++;
     }
-    try{
-        unsigned int hour,minute;
-        cout<<"hour  :";
-        cin>>hour;
-        cout<<"minute  :";
-        cin>>minute;
-         clock3= new Clock(hour,minute,unknown);
-         if(clock2==*clock3){
-             cout<<"same string"<<endl;
-         }
-
+    try
+    {
+        unsigned int h, m;
+        cout<<"hour: ";
+        cin>>h;
+        cout<<"minute: ";
+        cin>>m;
+        clock3=new Clock(h,m, unknown);
+        if(clock2==(*clock3))
+            cout<<"same time"<<endl;
     }
-    catch(Clock::MinuteTooBig)
-    {clock3=new Clock;}
-    catch(Clock::HourTooBig)
-    {clock3=new Clock;}
-
+    catch (Clock::HourTooBig hr)
+    {
+        clock3=new Clock();
+    }
+    catch(Clock::MinuteTooBig mi)
+    {
+        clock3=new Clock();
+    }
     cout<<*clock1<<endl;
     cout<<clock2<<endl;
-    cout<<"clock3"<<clock3<<endl;
+    cout<<*clock3<<endl;
     return 0;
 }
